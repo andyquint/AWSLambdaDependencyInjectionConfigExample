@@ -2,14 +2,11 @@
 using LambdaConfigExample.Models;
 using LambdaConfigExample.Services;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 
 namespace LambdaConfigExample.Functions
 {
-    public class GetUserFunction : LambdaFunction<int, UserInfo>
+    public class GetUserFunction : LambdaFunction<int, UserInfo, GetUser>
     {
-        protected override Type Handler => typeof(GetUser);
-
         protected override void RegisterDependencies(ServiceCollection serviceCollection)
         {
             serviceCollection.AddSingleton<IAppConfig, AppConfig>();

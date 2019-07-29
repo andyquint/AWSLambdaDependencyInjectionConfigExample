@@ -7,19 +7,12 @@ using System.Threading.Tasks;
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
 namespace LambdaConfigExample.Functions
 {
-    public abstract class LambdaFunction<TInput, TOutput>
+    public abstract class LambdaFunction<TInput, TOutput, THandler> where THandler : IHandler<TInput, TOutput>
     {
         private readonly IServiceProvider serviceProvider;
 
-        protected abstract Type Handler { get; }
-
         public LambdaFunction()
         {
-            if (!typeof(IHandler<TInput, TOutput>).IsAssignableFrom(Handler))
-            {
-                throw new ArgumentException("Handler does not implement correct interface.", this.Handler.Name);
-            }
-
             this.serviceProvider = ConfigureServices();
         }
 
@@ -39,7 +32,7 @@ namespace LambdaConfigExample.Functions
         {
             var serviceCollection = new ServiceCollection();
             this.RegisterDependencies(serviceCollection);
-            serviceCollection.AddSingleton(typeof(IHandler<TInput, TOutput>), Handler);
+            serviceCollection.AddSingleton(typeof(IHandler<TInput, TOutput>), typeof(THandler));
 
             return serviceCollection.BuildServiceProvider();
         }
