@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using System;
 
 namespace LambdaConfigExample.Services
 {
@@ -6,9 +7,17 @@ namespace LambdaConfigExample.Services
     {
         private readonly IConfiguration configuration;
 
-        public AppConfig(IConfiguration configuration)
+        public AppConfig()
         {
-            this.configuration = configuration;
+            var environmentName = Environment.GetEnvironmentVariable("EnvironmentName");
+
+            this.configuration = new ConfigurationBuilder()
+                .AddSystemsManager(configureSource =>
+                {
+                    configureSource.Path = $"/myapp/{environmentName}";
+                    configureSource.ReloadAfter = TimeSpan.FromMinutes(1);
+                })
+                .Build();
         }
 
         public string ConnectionString => this.configuration["connectionString"];

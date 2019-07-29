@@ -12,7 +12,7 @@ namespace LambdaConfigExample.Services
                 throw new ArgumentException("Invalid bucket name", nameof(bucketName));
             }
 
-            return $"hello.txt in bucket://{bucketName}/{key}";
+            return await Task.Run(() => $"hello.txt in bucket://{bucketName}/{key}");
         }
     }
 }

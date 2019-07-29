@@ -1,7 +1,5 @@
 ﻿using Amazon.Lambda.Core;
 using LambdaConfigExample.Handlers;
-using LambdaConfigExample.Services;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
@@ -17,7 +15,7 @@ namespace LambdaConfigExample.Functions
 
         public LambdaFunction()
         {
-            if (!typeof(IRun<TInput, TOutput>).IsAssignableFrom(Handler))
+            if (!typeof(IHandler<TInput, TOutput>).IsAssignableFrom(Handler))
             {
                 throw new ArgumentException("Handler does not implement correct interface.", this.Handler.Name);
             }
@@ -29,35 +27,21 @@ namespace LambdaConfigExample.Functions
         {
             using (var scope = this.serviceProvider.CreateScope())
             {
-                var result = await scope.ServiceProvider.GetService<IRun<TInput, TOutput>>().Handler(input, context);
+                var result = await scope.ServiceProvider.GetService<IHandler<TInput, TOutput>>().Run(input, context);
 
                 return result;
             }
         }
 
+        protected abstract void RegisterDependencies(ServiceCollection serviceCollection);
+
         private IServiceProvider ConfigureServices()
         {
             var serviceCollection = new ServiceCollection();
-            serviceCollection.AddSingleton(typeof(IRun<TInput, TOutput>), Handler);
-            serviceCollection.AddSingleton(sp => BuildConfiguration());
-            serviceCollection.AddSingleton<IAppConfig, AppConfig>();
-            serviceCollection.AddSingleton<IDataAccess, DataAccess>();
-            serviceCollection.AddSingleton<IFileStorage, FileStorage>();
+            this.RegisterDependencies(serviceCollection);
+            serviceCollection.AddSingleton(typeof(IHandler<TInput, TOutput>), Handler);
 
             return serviceCollection.BuildServiceProvider();
-        }
-
-        private static IConfiguration BuildConfiguration()
-        {
-            var environmentName = Environment.GetEnvironmentVariable("EnvironmentName");
-
-            return new ConfigurationBuilder()
-                .AddSystemsManager(configureSource =>
-                {
-                    configureSource.Path = $"/myapp/{environmentName}";
-                    configureSource.ReloadAfter = TimeSpan.FromMinutes(1);
-                })
-                .Build();
         }
     }
 }

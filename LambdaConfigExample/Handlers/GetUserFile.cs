@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace LambdaConfigExample.Handlers
 {
-    public class GetUserFile : IRun<UserInfo, string>
+    public class GetUserFile : IHandler<UserInfo, string>
     {
         private readonly IAppConfig appConfig;
         private readonly IDataAccess dataAccess;
@@ -18,7 +18,7 @@ namespace LambdaConfigExample.Handlers
             this.fileStorage = fileStorage;
         }
 
-        public async Task<string> Handler(UserInfo input, ILambdaContext context)
+        public async Task<string> Run(UserInfo input, ILambdaContext context)
         {
             var filePath = await this.dataAccess.GetFilePath(input);
             return await this.fileStorage.GetTextFileContents(this.appConfig.UserFileBucket, filePath);

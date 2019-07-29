@@ -14,16 +14,16 @@ namespace LambdaConfigExample.Services
 
         public async Task<string> GetFilePath(UserInfo userInfo)
         {
-            return "hello.txt";
+            return await Task.Run(() => "hello.txt");
         }
 
         public async Task<UserInfo> GetUserInfo(int id)
         {
-            return new UserInfo
+            return await Task.Run(() => new UserInfo
             {
                 Id = id,
                 Name = "some user",
-            };
+            });
         }
     }
 }

@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 
 namespace LambdaConfigExample.Handlers
 {
-    public interface IRun<TInput, TOutput>
+    public interface IHandler<TInput, TOutput>
     {
-        Task<TOutput> Handler(TInput input, ILambdaContext context);
+        Task<TOutput> Run(TInput input, ILambdaContext context);
     }
 }

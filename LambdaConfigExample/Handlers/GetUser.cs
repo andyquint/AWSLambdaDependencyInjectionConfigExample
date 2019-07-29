@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace LambdaConfigExample.Handlers
 {
-    public class GetUser : IRun<int, UserInfo>
+    public class GetUser : IHandler<int, UserInfo>
     {
         private readonly IDataAccess dataAccess;
 
@@ -14,7 +14,7 @@ namespace LambdaConfigExample.Handlers
             this.dataAccess = dataAccess;
         }
 
-        public async Task<UserInfo> Handler(int input, ILambdaContext context)
+        public async Task<UserInfo> Run(int input, ILambdaContext context)
         {
             return await this.dataAccess.GetUserInfo(input);
         }
